@@ -78,64 +78,39 @@ void getFunc7(string inp, string s)
         s = "error";
 }
 
-void getFunc3(string inp, string s)
-{
-    if (inp == "add" || inp == "sub" || inp == "mul" || inp == "sb")
-        s += "000";
-
-    else if (inp == "xor" || inp == "div")
-        s += "100";
-
-    else if (inp == "srl")
-        s += "101";
-
-    else if (inp == "sra")
-        s += "101";
-
-    else if (inp == "sll" || inp == "sh")
-        s += "001";
-
-    else if (inp == "slt" || inp == "sw")
-        s += "010";
-
-    else if (inp == "or" || inp == "rem")
-        s += "110";
-
-    else if (inp == "and")
-        s += "111";
-
-    else if (inp == "sd")
-        s += "011";
-
-    else if (inp == "lb" || inp == "jalr" || inp == "addi")
-        s += "000";
-
-    else if (inp == "lh")
-        s += "001";
-
-    else if (inp == "lw")
-        s += "010";
-
-    else if (inp == "ld")
-        s += "011";
-
-    else if (inp == "ori")
-        s += "110";
-
-    else if (inp == "andi")
-        s += "111";
-
-    else if (inp == "beq")
-        s += "000";
-
-    else if (inp == "bne")
-        s += "001";
-
-    else if (inp == "blt")
-        s += "100";
-
-    else if (inp == "bge")
-        s += "101";
+void getFunc3(string inp, string s) {
+    switch (inp[0]) {
+        case 'a':
+            s += (inp == "add" || inp == "addi") ? "000" : "001";
+            break;
+        case 'b':
+            s += (inp == "beq") ? "000" : ((inp == "bne") ? "001" : ((inp == "blt") ? "100" : ((inp == "bge") ? "101" : "")));
+            break;
+        case 'd':
+            s += ( inp == "ld" || inp == "sd") ? "011" : ((inp == "div")?"100":"");
+            break;
+        case 'l':
+            s += (inp == "lb") ? "000" : ((inp == "lh") ? "001" : ((inp == "lw")?"010":""));
+            break;
+        case 'm':
+            s += (inp == "mul") ? "000" : "";
+            break;
+        case 'o':
+            s += (inp == "or" || inp == "ori") ? "110" : "";
+            break;
+        case 'r':
+            s += (inp == "sra" || inp == "srl") ? "101" : ((inp == "rem")?"110":"");
+            break;
+        case 's':
+            s += (inp == "sb") ? "000" : ((inp == "sh")?"001":((inp == "sw") ? "010" : ((inp == "sll") ? "001" : ((inp == "slt") ? "010" : ((inp == "sub") ? "000" : "")))));
+            break;
+        case 'x':
+            s += (inp == "xor") ? "100" : "";
+            break;
+        default:
+            s += "111";
+            break;
+    }
 }
 
 void getImmediate(string inp, string s)
