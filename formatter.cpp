@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define ll long long
-
+#include <fstream>
 // I format -- > imm : rs1 : func3 : rd : opcode
 // U format -- >
 void getOpcode(string inp, string s)
@@ -178,5 +178,13 @@ void getImmediate(string inp, string s)
 
 int main()
 {
+    ofstream op("output.txt");
+    ifstream ip("input.txt");
+    string txt;
+    while (getline (ip, txt)) {
+        
+    }
+    op.close();
+    ip.close();
     return 0;
 }
