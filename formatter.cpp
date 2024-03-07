@@ -6,6 +6,7 @@ using namespace std;
 // U format -- >
 void getOpcode(string inp, string s)
 {
+    //hello
     // add the opcode for final output string of instruction
     if (inp == "addi" || inp == "andi" || inp == "ori")
         s += "0010011";
