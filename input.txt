@@ -1,0 +1,4 @@
+.data
+var1 : .byte 12 14 16 31
+var2 : .byte 11 14 16 31
+var4 : .word 0x10001010 32 12
