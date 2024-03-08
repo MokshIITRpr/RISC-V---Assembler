@@ -6,20 +6,20 @@ using namespace std;
 ll size = 0;
 // I format -- > imm : rs1 : func3 : rd : opcode
 // U format -- >
-void getOpcode(string inp, string s)
+string getOpcode(string inp, string s)
 {
     // hello
     //  add the opcode for final output string of instruction
-    if (inp == "addi" || inp == "andi" || inp == "ori")
+    if (inp == "add" || inp == "sll" || inp == "slt" || inp == "xor" || inp == "srl" || inp == "or" || inp == "and")
+        s += "0110011";
+    else if (inp == "addi" || inp == "andi" || inp == "ori")
         s += "0010011";
     else if (inp == "lb" || inp == "ld" || inp == "lw" || inp == "lh")
         s += "0000011";
     else if (inp == "jalr")
         s += "1100111";
-    else if (inp == "R")
-        s += "0110011";
 
-    else if (inp == "S")
+    else if (inp == "sb" || inp == "sh" || inp == "sw" || inp == "sd")
         s += "0100011";
     else if (inp == "auipc")
         s += "0010111";
@@ -29,14 +29,16 @@ void getOpcode(string inp, string s)
 
     else
         s = "error"; // check for error here in s only
+    return s;
 }
 
-void getRegister(string inp, string s)
+string getRegister(string inp, string s)
 {
-    if (s == "error" || inp[0] != 'x')
+
+    if (inp[0] != 'x')
     {
         s = "error";
-        return;
+        return s;
     }
 
     string neo;
@@ -56,28 +58,31 @@ void getRegister(string inp, string s)
     if (flag)
     {
         s = "error";
-        return;
+        return s;
     }
     ll get = stoi(neo);
+
     if (get >= 32 || get < 0)
     {
         s = "error";
-        return;
+        return s;
     }
-    for (ll i = 0; i < 5; i++)
+
+    for (ll i = 4; i >= 0; i--)
     {
-        if (get & (1 << i))
+        if (get & (1ll << i))
             s += '1';
         else
             s += '0';
     }
     // adding the 5 bit register value ---> unsigned
+    return s;
 }
 
-void getFunc7(string inp, string s)
+string getFunc7(string inp, string s)
 {
     if (s == "error")
-        return;
+        return s;
     if (inp == "sub" || inp == "sra")
         s += "0100000";
     else if (inp == "add" || inp == "sll" || inp == "slt" || inp == "xor" || inp == "srl" || inp == "or" || inp == "and")
@@ -88,84 +93,90 @@ void getFunc7(string inp, string s)
 
     else
         s = "error";
+    return s;
 }
 
-void getFunc3(string inp, string s)
+string getFunc3(string a, string s)
 {
-    switch (inp[0])
+    if (a == "add" || a == "sub" || a == "mul" || a == "sb")
     {
-    case 'a':
-        s += (inp == "add" || inp == "addi") ? "000" : "001";
-        break;
-    case 'b':
-        s += (inp == "beq") ? "000" : ((inp == "bne") ? "001" : ((inp == "blt") ? "100" : ((inp == "bge") ? "101" : "")));
-        break;
-    case 'd':
-        s += (inp == "ld" || inp == "sd") ? "011" : ((inp == "div") ? "100" : "");
-        break;
-    case 'l':
-        s += (inp == "lb") ? "000" : ((inp == "lh") ? "001" : ((inp == "lw") ? "010" : ""));
-        break;
-    case 'm':
-        s += (inp == "mul") ? "000" : "";
-        break;
-    case 'o':
-        s += (inp == "or" || inp == "ori") ? "110" : "";
-        break;
-    case 'r':
-        s += (inp == "sra" || inp == "srl") ? "101" : ((inp == "rem") ? "110" : "");
-        break;
-    case 's':
-        s += (inp == "sb") ? "000" : ((inp == "sh") ? "001" : ((inp == "sw") ? "010" : ((inp == "sll") ? "001" : ((inp == "slt") ? "010" : ((inp == "sub") ? "000" : "")))));
-        break;
-    case 'x':
-        s += (inp == "xor") ? "100" : "";
-        break;
-    default:
+        s += "000";
+    }
+    else if (a == "xor" || a == "div")
+    {
+        s += "100";
+    }
+    else if (a == "srl")
+    {
+        s += "101";
+    }
+    else if (a == "sra")
+    {
+        s += "101";
+    }
+    else if (a == "sll" || a == "sh")
+    {
+        s += "001";
+    }
+    else if (a == "slt" || a == "sw")
+    {
+        s += "010";
+    }
+    else if (a == "or" || a == "rem")
+    {
+        s += "110";
+    }
+    else if (a == "and")
+    {
         s += "111";
-        break;
     }
+    else if (a == "sd")
+    {
+        s += "011";
+    }
+    else if (a == "lb" || a == "jalr" || a == "addi")
+    {
+        s += "000";
+    }
+    else if (a == "lh")
+    {
+        s += "001";
+    }
+    else if (a == "lw")
+    {
+        s += "010";
+    }
+    else if (a == "ld")
+    {
+        s += "011";
+    }
+    else if (a == "ori")
+    {
+        s += "110";
+    }
+    else if (a == "andi")
+    {
+        s += "111";
+    }
+    else if (a == "beq")
+    {
+        s += "000";
+    }
+    else if (a == "bne")
+    {
+        s += "001";
+    }
+    else if (a == "blt")
+    {
+        s += "100";
+    }
+    else if (a == "bge")
+    {
+        s += "101";
+    }
+    return s;
 }
 
-void getImmediate(string inp, string s)
-{
-    // keep check for integer input only
-    if (s == "error")
-        return;
-    ll flag = 0;
-    for (ll i = 1; i < inp.size(); i++)
-    {
-        ll check = inp[i] - '0';
-        if (check > 9 || check < 0)
-        {
-            flag++;
-            break;
-        }
-    }
-    if (flag)
-    {
-        s = "error";
-        return;
-    }
-    ll get = stoi(inp);
-    if (get < 0)
-        get += (1ll << 12);
-    if (get < 0 || get >= (1ll << 12))
-    {
-        s = "error";
-        return;
-    }
-    // get binary for the immediate to be added
-    for (ll i = 0; i < 12; i++)
-    {
-        if (get & (1ll << i))
-            s += '1';
-        else
-            s += '0';
-    }
-}
-
-// add data to memory
 ll getData(string line)
 {
     // supports ---> binary + hex + ascii + integer
@@ -192,6 +203,36 @@ ll getData(string line)
         ret = stoi(line);
     return ret;
 }
+
+// copy till here ......................................................
+//....................................................................
+//...................................................................
+
+string getImmediate(string inp, string s)
+{
+    // keep check for integer input only
+    if (s == "error")
+        return s;
+    ll get = getData(inp);
+    if (get < 0)
+        get += (1ll << 12);
+    if (get >= (1ll << 12) || get < 0)
+    {
+        s = "error";
+        return s;
+    }
+    // get binary for the immediate to be added
+    for (ll i = 11; i >= 0; i--)
+    {
+        if (get & (1ll << i))
+            s += '1';
+        else
+            s += '0';
+    }
+    return s;
+}
+
+// add data to memory
 
 void addMemory(map<string, ll> &label, string txt, ll mem_arr[200])
 {
@@ -283,6 +324,88 @@ void display_memory(ll mem_arr[])
         cout << endl;
     }
 }
+// convert assebly to machine code
+void getRformat(string txt)
+{
+    istringstream iss(txt); // create string stream
+    string line;
+    iss >> line;
+    string keep = line;
+    vector<string> ret(6, "");
+    ret[0] = getOpcode(keep, ret[0]);
+    iss >> line;
+    // cout << line << endl;
+    ret[1] = getRegister(line, ret[1]);
+
+    iss >> line;
+    if (line == ",")
+        iss >> line;
+    ret[3] = getRegister(line, ret[3]);
+    iss >> line;
+    if (line == ",")
+        iss >> line;
+    ret[4] = getRegister(line, ret[4]);
+    ret[5] = getFunc7(keep, ret[5]);
+    ret[2] = getFunc3(keep, ret[2]);
+    string final;
+    final += "0x";
+    for (ll i = 5; i >= 0; i--)
+        final += ret[i];
+}
+
+void getIformat(string txt)
+{
+    istringstream iss(txt); // create string stream
+    string line;
+    iss >> line;
+    string keep = line;
+    vector<string> ret(5, "");
+    ret[0] = getOpcode(keep, ret[0]);
+    iss >> line;
+    // cout << line << endl;
+    ret[1] = getRegister(line, ret[1]);
+
+    iss >> line;
+    if (line == ",")
+        iss >> line;
+    ret[3] = getRegister(line, ret[3]);
+    iss >> line;
+    if (line == ",")
+        iss >> line;
+    ret[4] = getImmediate(line, ret[4]);
+    ret[2] = getFunc3(keep, ret[2]);
+    string final = "0x";
+    for (ll i = 4; i >= 0; i--)
+        final += ret[i];
+}
+
+void assemble(string txt)
+{
+    istringstream iss(txt); // create string stream
+    string line;
+    iss >> line;
+
+    if (line == "add" || line == "sub" || line == "xor" || line == "mul" || line == "div" || line == "rem" || line == "srl" || line == "sll" || line == "slt" || line == "or" || line == "and" || line == "sra")
+    {
+        getRformat(txt);
+    }
+    else if (line == "addi" || line == "andi" || line == "ori" || line == "lb" || line == "ld" || line == "lh" || line == "lw" || line == "jalr")
+    {
+        getIformat(txt);
+    }
+    else if (line == "sb" || line == "sw" || line == "sd" || line == "sh")
+    {
+    }
+    else if (line == "beq" || line == "bne" || line == "bge" || line == "blt")
+    {
+    }
+    else if (line == "jal")
+    {
+    }
+    else if (line == "auipc" || line == "lui")
+    {
+    }
+}
 
 int main()
 {
@@ -305,12 +428,19 @@ int main()
         {
 
             if (txt == ".text")
+            {
+                getline(file, txt);
                 break;
+            }
             addMemory(label, txt, mem_arr);
         }
+        display_memory(mem_arr);
     }
-    display_memory(mem_arr);
-
+    if (txt != ".text")
+        assemble(txt);
+    /*while(getline(file,txt)){
+        assemble(txt);
+    }*/
     op.close();
     file.close();
     return 0;
