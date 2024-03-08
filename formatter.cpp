@@ -100,13 +100,10 @@ string getFunc7(string inp, string s)
 
 string getFunc3(string a, string s)
 {
-    if (a == "add" || a == "sub" || a == "mul" || a == "sb")
+
+    if (a == "lb" || a == "jalr" || a == "addi")
     {
         s += "000";
-    }
-    else if (a == "xor" || a == "div")
-    {
-        s += "100";
     }
     else if (a == "srl")
     {
@@ -116,7 +113,47 @@ string getFunc3(string a, string s)
     {
         s += "101";
     }
+    else if (a == "xor" || a == "div")
+    {
+        s += "100";
+    }
+    else if (a == "and")
+    {
+        s += "111";
+    }
+    else if (a == "bge")
+    {
+        s += "101";
+    }
+    else if (a == "sd")
+    {
+        s += "011";
+    }
+    else if (a == "lw")
+    {
+        s += "010";
+    }
     else if (a == "sll" || a == "sh")
+    {
+        s += "001";
+    }
+    else if (a == "ld")
+    {
+        s += "011";
+    }
+    else if (a == "bne")
+    {
+        s += "001";
+    }
+    else if (a == "or" || a == "rem")
+    {
+        s += "110";
+    }
+    else if (a == "add" || a == "sub" || a == "mul" || a == "sb")
+    {
+        s += "000";
+    }
+     else if (a == "lh")
     {
         s += "001";
     }
@@ -124,58 +161,23 @@ string getFunc3(string a, string s)
     {
         s += "010";
     }
-    else if (a == "or" || a == "rem")
-    {
-        s += "110";
-    }
-    else if (a == "and")
-    {
-        s += "111";
-    }
-    else if (a == "sd")
-    {
-        s += "011";
-    }
-    else if (a == "lb" || a == "jalr" || a == "addi")
-    {
-        s += "000";
-    }
-    else if (a == "lh")
-    {
-        s += "001";
-    }
-    else if (a == "lw")
-    {
-        s += "010";
-    }
-    else if (a == "ld")
-    {
-        s += "011";
-    }
     else if (a == "ori")
     {
         s += "110";
-    }
-    else if (a == "andi")
-    {
-        s += "111";
     }
     else if (a == "beq")
     {
         s += "000";
     }
-    else if (a == "bne")
-    {
-        s += "001";
-    }
     else if (a == "blt")
     {
         s += "100";
     }
-    else if (a == "bge")
+    else if (a == "andi")
     {
-        s += "101";
+        s += "111";
     }
+    
     return s;
 }
 
