@@ -18,7 +18,9 @@ string getOpcode(string inp, string s)
         s += "0000011";
     else if (inp == "jalr")
         s += "1100111";
-
+    else if(inp=="beq" || inp=="bne" || inp=="bge" || inp=="blt")
+        s+= "1100011";
+    
     else if (inp == "sb" || inp == "sh" || inp == "sw" || inp == "sd")
         s += "0100011";
     else if (inp == "auipc")
