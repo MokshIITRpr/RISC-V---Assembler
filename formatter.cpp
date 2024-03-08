@@ -3,88 +3,109 @@
 using namespace std;
 #define ll long long
 #define Start 0x10000000
+map<string, ll> label;
+ll pc = 0; // program counter
 ll size = 0;
+vector<string> store; // store the the binary format for hex
 // I format -- > imm : rs1 : func3 : rd : opcode
 // U format -- >
 unordered_map<string, string> mpp;
 
-void initializeMap() {
-    pair<string,string>old_arr[] = 
-   {
-    make_pair("x0", "x0"),
-    make_pair("x1", "x1"), 
-    make_pair("x2", "x2"), 
-    make_pair("x3", "x3"), 
-    make_pair("x4", "x4"), 
-    make_pair("x5", "x5"), 
-    make_pair("x6", "x6"), 
-    make_pair("x7", "x7"), 
-    make_pair("x8", "x8"), 
-    make_pair("x9", "x9"), 
-    make_pair("x10", "x10"),
-    make_pair("x11", "x11"), 
-    make_pair("x12", "x12"), 
-    make_pair("x13", "x13"), 
-    make_pair("x14", "x14"), 
-    make_pair("x15", "x15"), 
-    make_pair("x16", "x16"), 
-    make_pair("x17", "x17"), 
-    make_pair("x18", "x18"), 
-    make_pair("x19", "x19"), 
-    make_pair("x20", "x20"),
-    make_pair("x21", "x21"), 
-    make_pair("x22", "x22"), 
-    make_pair("x23", "x23"), 
-    make_pair("x24", "x24"), 
-    make_pair("x25", "x25"), 
-    make_pair("x26", "x26"), 
-    make_pair("x27", "x27"), 
-    make_pair("x28", "x28"), 
-    make_pair("x29", "x29"), 
-    make_pair("x30", "x30"),
-    make_pair("x31", "x31"), 
-    make_pair("zero", "x0"), 
-    make_pair("ra", "x1"), 
-    make_pair("sp", "x2"), 
-    make_pair("gp", "x3"), 
-    make_pair("tp", "x4"), 
-    make_pair("t0", "x5"), 
-    make_pair("t1", "x6"), 
-    make_pair("t2", "x7"), 
-    make_pair("s0", "x8"), 
-    make_pair("s1", "x9"), 
-    make_pair("a0", "x10"),
-    make_pair("a1", "x11"), 
-    make_pair("a2", "x12"), 
-    make_pair("a3", "x13"), 
-    make_pair("a4", "x14"), 
-    make_pair("a5", "x15"), 
-    make_pair("a6", "x16"), 
-    make_pair("a7", "x17"), 
-    make_pair("s2", "x18"), 
-    make_pair("s3", "x19"), 
-    make_pair("s4", "x20"),
-    make_pair("s5", "x21"), 
-    make_pair("s6", "x22"), 
-    make_pair("s7", "x23"), 
-    make_pair("s8", "x24"), 
-    make_pair("s9", "x25"), 
-    make_pair("s10", "x26"), 
-    make_pair("s11", "x27"), 
-    make_pair("t3", "x28"), 
-    make_pair("t4", "x29"), 
-    make_pair("t5", "x30"),
-    make_pair("t6", "x31"),
-    
-   };
+void initializeMap()
+{
+    pair<string, string> old_arr[] =
+        {
+            make_pair("x0", "x0"),
+            make_pair("x1", "x1"),
+            make_pair("x2", "x2"),
+            make_pair("x3", "x3"),
+            make_pair("x4", "x4"),
+            make_pair("x5", "x5"),
+            make_pair("x6", "x6"),
+            make_pair("x7", "x7"),
+            make_pair("x8", "x8"),
+            make_pair("x9", "x9"),
+            make_pair("x10", "x10"),
+            make_pair("x11", "x11"),
+            make_pair("x12", "x12"),
+            make_pair("x13", "x13"),
+            make_pair("x14", "x14"),
+            make_pair("x15", "x15"),
+            make_pair("x16", "x16"),
+            make_pair("x17", "x17"),
+            make_pair("x18", "x18"),
+            make_pair("x19", "x19"),
+            make_pair("x20", "x20"),
+            make_pair("x21", "x21"),
+            make_pair("x22", "x22"),
+            make_pair("x23", "x23"),
+            make_pair("x24", "x24"),
+            make_pair("x25", "x25"),
+            make_pair("x26", "x26"),
+            make_pair("x27", "x27"),
+            make_pair("x28", "x28"),
+            make_pair("x29", "x29"),
+            make_pair("x30", "x30"),
+            make_pair("x31", "x31"),
+            make_pair("zero", "x0"),
+            make_pair("ra", "x1"),
+            make_pair("sp", "x2"),
+            make_pair("gp", "x3"),
+            make_pair("tp", "x4"),
+            make_pair("t0", "x5"),
+            make_pair("t1", "x6"),
+            make_pair("t2", "x7"),
+            make_pair("s0", "x8"),
+            make_pair("s1", "x9"),
+            make_pair("a0", "x10"),
+            make_pair("a1", "x11"),
+            make_pair("a2", "x12"),
+            make_pair("a3", "x13"),
+            make_pair("a4", "x14"),
+            make_pair("a5", "x15"),
+            make_pair("a6", "x16"),
+            make_pair("a7", "x17"),
+            make_pair("s2", "x18"),
+            make_pair("s3", "x19"),
+            make_pair("s4", "x20"),
+            make_pair("s5", "x21"),
+            make_pair("s6", "x22"),
+            make_pair("s7", "x23"),
+            make_pair("s8", "x24"),
+            make_pair("s9", "x25"),
+            make_pair("s10", "x26"),
+            make_pair("s11", "x27"),
+            make_pair("t3", "x28"),
+            make_pair("t4", "x29"),
+            make_pair("t5", "x30"),
+            make_pair("t6", "x31"),
 
-   int mppsize = (sizeof(old_arr) / 
-            sizeof(old_arr[0]));
-   
-   unordered_map<string, string> mpp1(old_arr, 
-                              old_arr + mppsize);
-    mpp=mpp1;
-    
+        };
+
+    int mppsize = (sizeof(old_arr) /
+                   sizeof(old_arr[0]));
+
+    unordered_map<string, string> mpp1(old_arr,
+                                       old_arr + mppsize);
+    mpp = mpp1;
+}
+
+string BinaryToHex(string s)
+{
+    // we know its a string of length 32 exactly
+    string ret = "0x";
+    for (ll i = 0; i < 32; i += 4)
+    {
+        string temp;
+        ll get = 0;
+        for (ll j = i; j < i + 4; j++)
+            s[j] == '0' ? get *= 2 : get = get * 2 + 1;
+        if (get >= 10)
+            ret += 'A' + get - 10;
+        else
+            ret += '0' + get;
+    }
+    return ret;
 }
 
 string getOpcode(string inp, string s)
@@ -99,9 +120,9 @@ string getOpcode(string inp, string s)
         s += "0000011";
     else if (inp == "jalr")
         s += "1100111";
-    else if(inp=="beq" || inp=="bne" || inp=="bge" || inp=="blt")
-        s+= "1100011";
-    
+    else if (inp == "beq" || inp == "bne" || inp == "bge" || inp == "blt")
+        s += "1100011";
+
     else if (inp == "sb" || inp == "sh" || inp == "sw" || inp == "sd")
         s += "0100011";
     else if (inp == "auipc")
@@ -181,10 +202,13 @@ string getFunc7(string inp, string s)
 
 string getFunc3(string a, string s)
 {
-
-    if (a == "lb" || a == "jalr" || a == "addi")
+    if (a == "add" || a == "sub" || a == "mul" || a == "sb")
     {
         s += "000";
+    }
+    else if (a == "xor" || a == "div")
+    {
+        s += "100";
     }
     else if (a == "srl")
     {
@@ -194,47 +218,7 @@ string getFunc3(string a, string s)
     {
         s += "101";
     }
-    else if (a == "xor" || a == "div")
-    {
-        s += "100";
-    }
-    else if (a == "and")
-    {
-        s += "111";
-    }
-    else if (a == "bge")
-    {
-        s += "101";
-    }
-    else if (a == "sd")
-    {
-        s += "011";
-    }
-    else if (a == "lw")
-    {
-        s += "010";
-    }
     else if (a == "sll" || a == "sh")
-    {
-        s += "001";
-    }
-    else if (a == "ld")
-    {
-        s += "011";
-    }
-    else if (a == "bne")
-    {
-        s += "001";
-    }
-    else if (a == "or" || a == "rem")
-    {
-        s += "110";
-    }
-    else if (a == "add" || a == "sub" || a == "mul" || a == "sb")
-    {
-        s += "000";
-    }
-     else if (a == "lh")
     {
         s += "001";
     }
@@ -242,23 +226,58 @@ string getFunc3(string a, string s)
     {
         s += "010";
     }
-    else if (a == "ori")
+    else if (a == "or" || a == "rem")
     {
         s += "110";
     }
-    else if (a == "beq")
+    else if (a == "and")
+    {
+        s += "111";
+    }
+    else if (a == "sd")
+    {
+        s += "011";
+    }
+    else if (a == "lb" || a == "jalr" || a == "addi")
     {
         s += "000";
     }
-    else if (a == "blt")
+    else if (a == "lh")
     {
-        s += "100";
+        s += "001";
+    }
+    else if (a == "lw")
+    {
+        s += "010";
+    }
+    else if (a == "ld")
+    {
+        s += "011";
+    }
+    else if (a == "ori")
+    {
+        s += "110";
     }
     else if (a == "andi")
     {
         s += "111";
     }
-    
+    else if (a == "beq")
+    {
+        s += "000";
+    }
+    else if (a == "bne")
+    {
+        s += "001";
+    }
+    else if (a == "blt")
+    {
+        s += "100";
+    }
+    else if (a == "bge")
+    {
+        s += "101";
+    }
     return s;
 }
 
@@ -317,9 +336,33 @@ string getImmediate(string inp, string s)
     return s;
 }
 
+string getImmediateSB(string inp, string s)
+{
+    // keep check for integer input only
+    if (s == "error")
+        return s;
+    ll get = getData(inp);
+    if (get < 0)
+        get += (1ll << 13);
+    if (get >= (1ll << 13) || get < 0)
+    {
+        s = "error";
+        return s;
+    }
+    // get binary for the immediate to be added
+    for (ll i = 12; i >= 0; i--)
+    {
+        if (get & (1ll << i))
+            s += '1';
+        else
+            s += '0';
+    }
+    return s;
+}
+
 // add data to memory
 
-void addMemory(map<string, ll> &label, string txt, ll mem_arr[200])
+void addMemory(string txt, ll mem_arr[200])
 {
 
     istringstream iss(txt);
@@ -412,6 +455,7 @@ void display_memory(ll mem_arr[])
 // convert assebly to machine code
 void getRformat(string txt)
 {
+    string final;
     istringstream iss(txt); // create string stream
     string line;
     iss >> line;
@@ -432,14 +476,17 @@ void getRformat(string txt)
     ret[4] = getRegister(line, ret[4]);
     ret[5] = getFunc7(keep, ret[5]);
     ret[2] = getFunc3(keep, ret[2]);
-    string final;
-    final += "0x";
+
     for (ll i = 5; i >= 0; i--)
+    {
         final += ret[i];
+    }
+    store.push_back(final);
 }
 
 void getIformat(string txt)
 {
+    string final;
     istringstream iss(txt); // create string stream
     string line;
     iss >> line;
@@ -459,17 +506,124 @@ void getIformat(string txt)
         iss >> line;
     ret[4] = getImmediate(line, ret[4]);
     ret[2] = getFunc3(keep, ret[2]);
-    string final = "0x";
+
     for (ll i = 4; i >= 0; i--)
+    {
         final += ret[i];
+    }
+    store.push_back(final);
 }
 
+void getSformat(string txt)
+{
+    string final;
+    istringstream iss(txt); // create string stream
+    string line;
+    iss >> line;
+    string keep = line;
+    vector<string> ret(6, "");
+    ret[0] = getOpcode(keep, ret[0]);
+    ret[2] = getFunc3(keep, ret[2]);
+    iss >> line;
+    if (line == ",")
+        iss >> line;
+    ret[4] = getRegister(line, ret[4]);
+
+    iss >> line;
+    if (line == ",")
+        iss >> line;
+    // now the line is of type offset(register)
+    string off, reg;
+    ll ind = 0;
+    while (line[ind] != '(')
+    {
+        off += line[ind];
+        ind++;
+    }
+    ind++;
+    while (line[ind] != ')')
+    {
+        reg += line[ind];
+        ind++;
+    }
+
+    ret[3] = getRegister(reg, ret[3]);
+    ret[5] = getImmediate(off, ret[5]);
+    // now we break the immediate field
+    string temp = ret[5];
+    ret[5] = "";
+    for (ll i = 0; i < 7; i++)
+        ret[5] += temp[i];
+    for (ll i = 7; i <= 11; i++)
+        ret[1] += temp[i];
+
+    for (ll i = 5; i >= 0; i--)
+    {
+        final += ret[i];
+    }
+    store.push_back(final);
+}
+
+void getSBformat(string txt)
+{
+    istringstream iss(txt); // create string stream
+    string line;
+    iss >> line;
+    string keep = line;
+    vector<string> ret(6, "");
+    ret[0] = getOpcode(keep, ret[0]);
+    ret[2] = getFunc3(keep, ret[2]);
+    iss >> line;
+    ret[3] = getRegister(line, ret[3]);
+    iss >> line;
+    if (line == ",")
+        iss >> line;
+    ret[4] = getRegister(line, ret[4]);
+    iss >> line;
+    if (line == ",")
+        iss >> line;
+    string final;
+    if (label.find(line) == label.end())
+    {
+        final = "No such label was found\n";
+    }
+    ll imm = label[line] - pc;
+    string get = to_string(imm);
+    ret[5] = getImmediateSB(get, ret[5]);
+    string temp = ret[5];
+    ret[5] = "";
+    ret[5] += temp[0];
+    for (ll i = 2; i <= 7; i++)
+        ret[5] += temp[i];
+    for (ll i = 8; i < 12; i++)
+        ret[1] += temp[i];
+    ret[1] += temp[1];
+    for (ll i = 5; i >= 0; i--)
+        final += ret[i];
+    store.push_back(final);
+}
+
+void getUformat(string txt)
+{
+}
+
+void getUJformat(string txt)
+{
+}
 void assemble(string txt)
 {
     istringstream iss(txt); // create string stream
     string line;
     iss >> line;
-
+    string keep = line;
+    if (keep[keep.size() - 1] != ':')
+        iss >> line;
+    if (line == ":" || keep[keep.size() - 1] == ':')
+    {
+        label[keep] = pc;
+        return;
+    }
+    line = keep;
     if (line == "add" || line == "sub" || line == "xor" || line == "mul" || line == "div" || line == "rem" || line == "srl" || line == "sll" || line == "slt" || line == "or" || line == "and" || line == "sra")
     {
         getRformat(txt);
@@ -480,9 +634,11 @@ void assemble(string txt)
     }
     else if (line == "sb" || line == "sw" || line == "sd" || line == "sh")
     {
+        getSformat(txt);
     }
     else if (line == "beq" || line == "bne" || line == "bge" || line == "blt")
     {
+        getSBformat(txt);
     }
     else if (line == "jal")
     {
@@ -490,22 +646,34 @@ void assemble(string txt)
     else if (line == "auipc" || line == "lui")
     {
     }
+    pc += 4; // after each operation
+    return;
 }
-
+void read(string txt)
+{
+    istringstream iss(txt); // create string stream
+    string line;
+    iss >> line;
+    string keep = line;
+    if (keep[keep.size() - 1] != ':')
+        iss >> line;
+    if (line == ":" || keep[keep.size() - 1] == ':')
+    {
+        label[keep] = pc;
+        return; // only label in that line
+    }
+    pc += 4;
+}
 int main()
 {
-    initializeMap();
     ofstream op("output.txt");
     ifstream file("input.txt");
     string txt;
     ll mem_arr[200];
     for (ll i = 0; i < 200; i++)
         mem_arr[i] = 0;
-    map<string, ll> label;
     ll flag = 0;
     ll memory = Start; // memory
-
-    ll pc = 0; // program counter
     getline(file, txt);
 
     if (txt == ".data")
@@ -518,16 +686,47 @@ int main()
                 getline(file, txt);
                 break;
             }
-            addMemory(label, txt, mem_arr);
+            addMemory(txt, mem_arr);
         }
         display_memory(mem_arr);
     }
     if (txt != ".text")
-        assemble(txt);
-    /*while(getline(file,txt)){
-        assemble(txt);
-    }*/
-    op.close();
+        read(txt);
+    while (getline(file, txt))
+        read(txt);
     file.close();
+
+    // we can get a read of the file beforehand as a cheat to get the labels
+    // then we simply reset the program counter.
+
+    ifstream file2("input.txt");
+    getline(file2, txt);
+    pc = 0;
+    if (txt == ".data")
+    {
+        while (getline(file2, txt))
+        {
+            if (txt == ".text")
+            {
+                getline(file2, txt);
+                break;
+            }
+        }
+    }
+    if (txt != ".text")
+        assemble(txt);
+    while (getline(file2, txt))
+    {
+        assemble(txt);
+    }
+
+    // for now print data here only for testing
+    cout << store.size() << endl;
+    for (auto i : store)
+        cout << BinaryToHex(i) << endl;
+    // end of printing
+
+    op.close();
+    file2.close();
     return 0;
 }
