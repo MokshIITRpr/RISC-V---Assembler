@@ -2,6 +2,7 @@
 #include <fstream>
 using namespace std;
 #define ll long long
+#define err 1e18
 #define Start 0x10000000
 map<string, ll> label;
 ll pc = 0; // program counter
@@ -9,7 +10,7 @@ ll size = 0;
 vector<string> store; // store the the binary format for hex
 // I format -- > imm : rs1 : func3 : rd : opcode
 // U format -- >
-unordered_map<string, string> mpp;
+unordered_map<string, string> registers;
 
 void initializeMap()
 {
@@ -87,7 +88,7 @@ void initializeMap()
 
     unordered_map<string, string> mpp1(old_arr,
                                        old_arr + mppsize);
-    mpp = mpp1;
+    registers = mpp1;
 }
 
 string BinaryToHex(string s)
@@ -130,7 +131,8 @@ string getOpcode(string inp, string s)
 
     else if (inp == "lui")
         s += "0110111";
-
+    else if (inp == "jal")
+        s += "1101111";
     else
         s = "error"; // check for error here in s only
     return s;
@@ -138,7 +140,11 @@ string getOpcode(string inp, string s)
 
 string getRegister(string inp, string s)
 {
-
+    /* if (registers.find(inp) == registers.end())
+     {
+         return "error";
+     }*/
+    // cout << registers[inp] << " ";
     if (inp[0] != 'x')
     {
         s = "error";
@@ -288,15 +294,29 @@ ll getData(string line)
     ll ret = 0;
     if (line[0] == '0' && line[1] == 'x')
     {
+        if (line.size() > 10)
+            return (ll)err;
         for (ll i = 2; i < min((ll)line.size(), 10ll); i++)
             final += line[i];
         ret = stoi(final, 0, 16);
     }
     else if (line[0] == '0')
     {
+        if (line.size() > 33)
+            return err;
         for (ll i = 1; i < line.size(); i++)
             final += line[i];
         ret = stoi(final, 0, 2);
+    }
+    else if (line[0] == '-')
+    {
+        string temp;
+        for (ll i = 1; i < line.size(); i++)
+            temp += line[i];
+        ret = stoi(temp);
+        if (ret > (1ll << 32))
+            return err;
+        ret = -ret;
     }
     else if ((ll)(line[0] - '0') < 0 || (ll)(line[0] - '0') > 9)
     { // no intger detected
@@ -318,9 +338,11 @@ string getImmediate(string inp, string s)
     if (s == "error")
         return s;
     ll get = getData(inp);
+    if (get == err)
+        return "error";
     if (get < 0)
-        get += (1ll << 12);
-    if (get >= (1ll << 12) || get < 0)
+        get += (1ll << 11);
+    if (get >= (1ll << 11) || get < 0)
     {
         s = "error";
         return s;
@@ -342,6 +364,8 @@ string getImmediateSB(string inp, string s)
     if (s == "error")
         return s;
     ll get = getData(inp);
+    if (get == err)
+        return "error";
     if (get < 0)
         get += (1ll << 13);
     if (get >= (1ll << 13) || get < 0)
@@ -351,6 +375,28 @@ string getImmediateSB(string inp, string s)
     }
     // get binary for the immediate to be added
     for (ll i = 12; i >= 0; i--)
+    {
+        if (get & (1ll << i))
+            s += '1';
+        else
+            s += '0';
+    }
+    return s;
+}
+
+string getImmediateU(string inp, string s)
+{
+    // keep check for integer input only
+    if (s == "error")
+        return s;
+    ll get = getData(inp);
+    if (get == err)
+        return "error";
+    if (get < 0)
+        get += (1ll << 12);
+    get <<= 12;
+    // get binary for the immediate to be added
+    for (ll i = 31; i >= 12; i--)
     {
         if (get & (1ll << i))
             s += '1';
@@ -480,6 +526,11 @@ void getRformat(string txt)
     for (ll i = 5; i >= 0; i--)
     {
         final += ret[i];
+        if (ret[i] == "error")
+        {
+            store.push_back("error");
+            return;
+        }
     }
     store.push_back(final);
 }
@@ -510,6 +561,11 @@ void getIformat(string txt)
     for (ll i = 4; i >= 0; i--)
     {
         final += ret[i];
+        if (ret[i] == "error")
+        {
+            store.push_back("error");
+            return;
+        }
     }
     store.push_back(final);
 }
@@ -560,6 +616,11 @@ void getSformat(string txt)
     for (ll i = 5; i >= 0; i--)
     {
         final += ret[i];
+        if (ret[i] == "error")
+        {
+            store.push_back("error");
+            return;
+        }
     }
     store.push_back(final);
 }
@@ -583,11 +644,14 @@ void getSBformat(string txt)
     if (line == ",")
         iss >> line;
     string final;
+
     if (label.find(line) == label.end())
     {
-        final = "No such label was found\n";
+        store.push_back("error");
+        return;
     }
     ll imm = label[line] - pc;
+    // if(imm<0)imm+=
     string get = to_string(imm);
     ret[5] = getImmediateSB(get, ret[5]);
     string temp = ret[5];
@@ -599,16 +663,93 @@ void getSBformat(string txt)
         ret[1] += temp[i];
     ret[1] += temp[1];
     for (ll i = 5; i >= 0; i--)
+    {
         final += ret[i];
+        if (ret[i] == "error")
+        {
+            store.push_back("error");
+            return;
+        }
+    }
     store.push_back(final);
 }
 
 void getUformat(string txt)
 {
+    istringstream iss(txt); // create string stream
+    string line;
+    iss >> line;
+    string keep = line;
+    string final;
+    vector<string> ret(3, "");
+    ret[0] = getOpcode(line, ret[0]);
+    iss >> line;
+    if (line == ",")
+        iss >> line;
+    ret[1] = getRegister(line, ret[1]);
+    iss >> line;
+    if (line == ",")
+        iss >> line;
+    ret[2] = getImmediateU(line, ret[2]);
+    for (ll i = 2; i >= 0; i--)
+    {
+        final += ret[i];
+        if (ret[i] == "error")
+        {
+            store.push_back("error");
+            return;
+        }
+    }
+    store.push_back(final);
 }
 
 void getUJformat(string txt)
 {
+    istringstream iss(txt); // create string stream
+    string line;
+    iss >> line;
+    string keep = line;
+    string final;
+    vector<string> ret(3, "");
+    ret[0] = getOpcode(line, ret[0]);
+    iss >> line;
+    if (line == ",")
+        iss >> line;
+    ret[1] = getRegister(line, ret[1]);
+    iss >> line;
+    if (line == ",")
+        iss >> line;
+    if (label.find(line) == label.end())
+    {
+        store.push_back("error");
+        return;
+    }
+    ll jump = label[line] - pc;
+    for (ll i = 20; i >= 1; i--)
+    {
+        if ((1ll << i) & jump)
+            ret[2] += '1';
+        else
+            ret[2] += '0';
+    }
+    string temp = ret[2];
+    ret[2] = "";
+    ret[2] += temp[0];
+    for (ll i = 10; i < 20; i++)
+        ret[2] += temp[i];
+    ret[2] += temp[9];
+    for (ll i = 1; i <= 8; i++)
+        ret[2] += temp[i];
+    for (ll i = 2; i >= 0; i--)
+    {
+        final += ret[i];
+        if (ret[i] == "error")
+        {
+            store.push_back("error");
+            return;
+        }
+    }
+    store.push_back(final);
 }
 void assemble(string txt)
 {
@@ -642,9 +783,11 @@ void assemble(string txt)
     }
     else if (line == "jal")
     {
+        getUJformat(txt);
     }
     else if (line == "auipc" || line == "lui")
     {
+        getUformat(txt);
     }
     pc += 4; // after each operation
     return;
@@ -723,7 +866,12 @@ int main()
     // for now print data here only for testing
     cout << store.size() << endl;
     for (auto i : store)
-        cout << BinaryToHex(i) << endl;
+    {
+        if (i != "error")
+            cout << BinaryToHex(i) << endl;
+        else
+            cout << i << endl;
+    }
     // end of printing
 
     op.close();
