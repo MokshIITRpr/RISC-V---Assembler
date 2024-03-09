@@ -340,13 +340,14 @@ string getImmediate(string inp, string s)
     ll get = getData(inp);
     if (get == err)
         return "error";
-    if (get < 0)
-        get += (1ll << 11);
-    if (get >= (1ll << 11) || get < 0)
+    
+    if (get >= (1ll << 11) || get <=-(1ll<<11))
     {
         s = "error";
         return s;
     }
+    if (get < 0)
+        get += (1ll << 12);
     // get binary for the immediate to be added
     for (ll i = 11; i >= 0; i--)
     {
