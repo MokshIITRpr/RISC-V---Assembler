@@ -6,7 +6,7 @@ using namespace std;
 #define Start 0x10000000
 map<string, ll> label;
 ll pc = 0; // program counter
-ll size = 0;
+ll size1 = 0;
 vector<string> store; // store the the binary format for hex
 // I format -- > imm : rs1 : func3 : rd : opcode
 // U format -- >
@@ -424,7 +424,7 @@ void addMemory(string txt, ll mem_arr[200])
             temp += line[i];
         line = temp;
     }
-    label[temp] = Start + size; // marking for la
+    label[temp] = Start + size1; // marking for la
     if (line[line.size() - 1] != ':')
         iss >> line; // jump to next line
     iss >> line;
@@ -435,8 +435,8 @@ void addMemory(string txt, ll mem_arr[200])
             if (line == ",")
                 continue;
             ll get = getData(line);
-            mem_arr[size] = get;
-            size++;
+            mem_arr[size1] = get;
+            size1++;
         }
     }
     else if (line == ".word")
@@ -453,8 +453,8 @@ void addMemory(string txt, ll mem_arr[200])
             {
                 ll g = mask & get;
                 get >>= 8;
-                mem_arr[size] = g;
-                size++;
+                mem_arr[size1] = g;
+                size1++;
                 // we have added to one byte
             }
         }
@@ -468,8 +468,8 @@ void addMemory(string txt, ll mem_arr[200])
             ll get = 0;
             for (ll i = 0; i < line.size(); i++)
                 get += (ll)line[i];
-            mem_arr[size] = get;
-            size++;
+            mem_arr[size1] = get;
+            size1++;
         }
     }
     return;
@@ -810,6 +810,7 @@ void read(string txt)
 }
 int main()
 {
+    initializeMap();
     ofstream op("output.txt");
     ifstream file("input.txt");
     string txt;
