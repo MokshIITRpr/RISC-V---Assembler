@@ -905,7 +905,7 @@ int main()
     // then we simply reset the program counter.
 
     ifstream file2("input.asm");
-    getline(file2, txt);
+
     pc = 0;
 
     while (getline(file2, txt))
