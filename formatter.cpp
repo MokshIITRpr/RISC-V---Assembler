@@ -878,11 +878,11 @@ void assemble(string txt)
     {
         getRformat(txt);
     }
-    else if (line == "addi" || line == "andi" || line == "ori")
+    else if (line == "addi" || line == "andi" || line == "ori" || line == "jalr")
     {
         getIformat(txt);
     }
-    else if (line == "lb" || line == "ld" || line == "lh" || line == "lw" || line == "jalr")
+    else if (line == "lb" || line == "ld" || line == "lh" || line == "lw")
     {
         getNewIformat(txt);
     }
