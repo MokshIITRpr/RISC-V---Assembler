@@ -424,16 +424,17 @@ void addMemory(string txt, ll mem_arr[200])
     // first is label
     iss >> line;
     string temp = line;
+
     if (line[line.size() - 1] == ':')
     {
         temp = "";
         for (ll i = 0; i < line.size() - 1; i++)
             temp += line[i];
-        line = temp;
     }
     label[temp] = Start + size1; // marking for la
     if (line[line.size() - 1] != ':')
         iss >> line; // jump to next line
+
     iss >> line;
     if (line == ".byte")
     {
