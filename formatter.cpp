@@ -154,7 +154,7 @@ string getRegister(string inp, string s)
     }
 
     string neo;
-    ll sz;
+    ll sz = inp.size();
     if (inp[inp.size() - 1] == ',')
         sz = inp.size() - 1;
     else
@@ -301,7 +301,9 @@ ll getData(string line)
     // supports ---> binary + hex + ascii + integer
     string final;
     ll ret = 0;
-    if (line[0] == '0' && line[1] == 'x')
+    if (line == "0")
+        ret = 0;
+    else if (line[0] == '0' && line[1] == 'x')
     {
         if (line.size() > 10)
             return (ll)err;
@@ -827,7 +829,18 @@ void getUJformat(string txt)
     iss >> line;
     if (line == ",")
         iss >> line;
-    if (label.find(line) == label.end())
+    bool flag = all_of(line.begin(), line.end(), ::isdigit); // not even integer in jump
+    if (label.find(line) == label.end() && !flag)
+    {
+        store.push_back("error");
+        return;
+    }
+    ll imm;
+    if (label.find(line) != label.end())
+        imm = label[line] - pc;
+    else
+        imm = stoi(line);
+    if (imm % 4 != 0)
     {
         store.push_back("error");
         return;
@@ -870,7 +883,6 @@ void assemble(string txt)
         iss >> line;
     if (line == ":" || keep[keep.size() - 1] == ':')
     {
-        label[keep] = pc;
         return;
     }
     line = keep;
@@ -1039,8 +1051,8 @@ int main()
         op << endl;
         Start -= 4;
     }
-
-    // display_memory(mem_arr);
+    /*for (auto i : label)
+        cout << i.first << endl;*/
     op.close();
     file2.close();
     return 0;
