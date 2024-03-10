@@ -475,7 +475,7 @@ void addMemory(string txt, ll mem_arr[200])
             ll get = 0;
             for (ll i = 1; i < line.size() - 1; i++)
             {
-                get += (ll)line[i];
+                get = (ll)line[i];
                 mem_arr[size1] = get;
                 size1++; // assign to each charatcer one block
             }
