@@ -38,5 +38,3 @@ blt x22 x23 label4
 label4:
 auipc x24 0x800
 lui x25 0x1234
-jal x26 label5
-label5:
