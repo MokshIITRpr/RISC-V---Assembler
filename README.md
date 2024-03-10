@@ -62,9 +62,13 @@ Our project supports below mentioned instructions:
     ```bash
     ./a.out
     ```
-
-
 4. You are ready with machine code in `output.mc` file, which includes the memory segment as well.
+
+Running locally on device after downloading the files:
+--> You must keep input.asm and main.cpp in the same folder and then run main.cpp.
+--> The output will be generated in the file named output.mc.
+--> First the machine code and pc will be printed.
+--> Then the memeory will be printed and the memory of size 200 bytes will be displayed.
 
 
 
