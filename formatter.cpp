@@ -3,11 +3,12 @@
 using namespace std;
 #define ll long long
 #define err 1e18
-#define Start 0x10000000
+ll Start = (1ll << 28) + 200;
 map<string, ll> label;
 ll pc = 0; // program counter
 ll size1 = 0;
 vector<string> store; // store the the binary format for hex
+vector<ll> pc_count;
 // I format -- > imm : rs1 : func3 : rd : opcode
 // U format -- >
 unordered_map<string, string> registers;
@@ -140,10 +141,11 @@ string getOpcode(string inp, string s)
 
 string getRegister(string inp, string s)
 {
-    /* if (registers.find(inp) == registers.end())
-     {
-         return "error";
-     }*/
+    if (registers.find(inp) == registers.end())
+    {
+        return "error";
+    }
+    inp = registers[inp];
     // cout << registers[inp] << " ";
     if (inp[0] != 'x')
     {
@@ -328,10 +330,6 @@ ll getData(string line)
     return ret;
 }
 
-// copy till here ......................................................
-//....................................................................
-//...................................................................
-
 string getImmediate(string inp, string s)
 {
     // keep check for integer input only
@@ -340,8 +338,8 @@ string getImmediate(string inp, string s)
     ll get = getData(inp);
     if (get == err)
         return "error";
-    
-    if (get >= (1ll << 11) || get <=-(1ll<<11))
+
+    if (get >= (1ll << 11) || get <= -(1ll << 11))
     {
         s = "error";
         return s;
@@ -467,9 +465,51 @@ void addMemory(string txt, ll mem_arr[200])
                 continue;
             ll get = 0;
             for (ll i = 0; i < line.size(); i++)
+            {
                 get += (ll)line[i];
-            mem_arr[size1] = get;
-            size1++;
+                mem_arr[size1] = get;
+                size1++; // assign to each charatcer one block
+            }
+        }
+    }
+    else if (line == ".half")
+    {
+        while (iss >> line)
+        {
+            if (line == ",")
+                continue;
+            ll get = getData(line);
+
+            // now we have data in integer format and need to break datat into 2 parts
+            ll mask = 255; // extraxt 8 bits
+            for (ll i = 0; i < 2; i++)
+            {
+                ll g = mask & get;
+                get >>= 8;
+                mem_arr[size1] = g;
+                size1++;
+                // we have added to one byte
+            }
+        }
+    }
+    else if (line == ".dword")
+    {
+        while (iss >> line)
+        {
+            if (line == ",")
+                continue;
+            ll get = getData(line);
+
+            // now we have data in integer format and need to break datat into 8 parts
+            ll mask = 255; // extraxt 8 bits
+            for (ll i = 0; i < 8; i++)
+            {
+                ll g = mask & get;
+                get >>= 8;
+                mem_arr[size1] = g;
+                size1++;
+                // we have added to one byte
+            }
         }
     }
     return;
@@ -534,6 +574,7 @@ void getRformat(string txt)
         }
     }
     store.push_back(final);
+    pc_count.push_back(pc);
 }
 
 void getIformat(string txt)
@@ -569,6 +610,7 @@ void getIformat(string txt)
         }
     }
     store.push_back(final);
+    pc_count.push_back(pc);
 }
 
 void getSformat(string txt)
@@ -624,6 +666,7 @@ void getSformat(string txt)
         }
     }
     store.push_back(final);
+    pc_count.push_back(pc);
 }
 
 void getSBformat(string txt)
@@ -645,13 +688,22 @@ void getSBformat(string txt)
     if (line == ",")
         iss >> line;
     string final;
-
-    if (label.find(line) == label.end())
+    bool flag = all_of(line.begin(), line.end(), ::isdigit); // not even integer in jump
+    if (label.find(line) == label.end() && !flag)
     {
         store.push_back("error");
         return;
     }
-    ll imm = label[line] - pc;
+    ll imm;
+    if (label.find(line) != label.end())
+        imm = label[line] - pc;
+    else
+        imm = stoi(line);
+    if (imm % 4 != 0)
+    {
+        store.push_back("error");
+        return;
+    }
     // if(imm<0)imm+=
     string get = to_string(imm);
     ret[5] = getImmediateSB(get, ret[5]);
@@ -673,6 +725,7 @@ void getSBformat(string txt)
         }
     }
     store.push_back(final);
+    pc_count.push_back(pc);
 }
 
 void getUformat(string txt)
@@ -702,6 +755,7 @@ void getUformat(string txt)
         }
     }
     store.push_back(final);
+    pc_count.push_back(pc);
 }
 
 void getUJformat(string txt)
@@ -751,6 +805,7 @@ void getUJformat(string txt)
         }
     }
     store.push_back(final);
+    pc_count.push_back(pc);
 }
 void assemble(string txt)
 {
@@ -790,6 +845,10 @@ void assemble(string txt)
     {
         getUformat(txt);
     }
+    else
+    {
+        store.push_back("Unknown operand type");
+    }
     pc += 4; // after each operation
     return;
 }
@@ -811,71 +870,112 @@ void read(string txt)
 int main()
 {
     initializeMap();
-    ofstream op("output.txt");
-    ifstream file("input.txt");
+    ofstream op("output.mc");
+    ifstream file("input.asm");
     string txt;
-    ll mem_arr[200];
-    for (ll i = 0; i < 200; i++)
+    ll mem_arr[204];
+    for (ll i = 0; i < 204; i++)
         mem_arr[i] = 0;
     ll flag = 0;
     ll memory = Start; // memory
-    getline(file, txt);
-
-    if (txt == ".data")
+    while (getline(file, txt))
     {
-        while (getline(file, txt))
+        if (txt == ".data")
         {
 
-            if (txt == ".text")
+            while (getline(file, txt))
             {
-                getline(file, txt);
-                break;
+
+                if (txt == ".text")
+                {
+                    // getline(file, txt);
+                    break;
+                }
+                addMemory(txt, mem_arr);
             }
-            addMemory(txt, mem_arr);
         }
-        display_memory(mem_arr);
+        else if (txt == ".text")
+            continue;
+        else
+            read(txt);
     }
-    if (txt != ".text")
-        read(txt);
-    while (getline(file, txt))
-        read(txt);
     file.close();
 
     // we can get a read of the file beforehand as a cheat to get the labels
     // then we simply reset the program counter.
 
-    ifstream file2("input.txt");
+    ifstream file2("input.asm");
     getline(file2, txt);
     pc = 0;
-    if (txt == ".data")
-    {
-        while (getline(file2, txt))
-        {
-            if (txt == ".text")
-            {
-                getline(file2, txt);
-                break;
-            }
-        }
-    }
-    if (txt != ".text")
-        assemble(txt);
+
     while (getline(file2, txt))
     {
-        assemble(txt);
+        if (txt == ".data")
+        {
+            while (getline(file2, txt))
+            {
+                if (txt == ".text")
+                {
+                    // getline(file2, txt);
+                    break;
+                }
+            }
+        }
+        else if (txt == ".text")
+            continue;
+        else
+            assemble(txt);
     }
 
     // for now print data here only for testing
-    cout << store.size() << endl;
+    // cout << store.size() << endl;
+    ll ct = 0;
     for (auto i : store)
     {
-        if (i != "error")
-            cout << BinaryToHex(i) << endl;
+        if (i[0] == '0' || i[0] == '1')
+        {
+            op << "0x";
+            op << hex << pc_count[ct] << "   ";
+            op << BinaryToHex(i) << endl;
+        }
         else
-            cout << i << endl;
+        {
+            op << i << endl;
+            break;
+        }
+        ct++;
     }
+    op << "\n\n";
+    op << "------------------------------------------------------------------------------------------------------------------------\n\n";
+    op << "Memory from 0x10000000 is displayed here\n\n";
+
     // end of printing
 
+    for (ll i = 203; i >= 0; i -= 4)
+    {
+        op << "0x";
+        op << hex << Start << "    ";
+        for (ll j = i; j >= i - 3; j--)
+        {
+            ll val = mem_arr[j];
+            string result = "00";
+            ll add = val % 16;
+            if (add >= 10)
+                result[1] = 'A' + add - 10;
+            else
+                result[1] = '0' + add;
+            val /= 16;
+            add = val % 16;
+            if (add >= 10)
+                result[0] = 'A' + add - 10;
+            else
+                result[0] = '0' + add;
+            op << result << " ";
+        }
+        op << endl;
+        Start -= 4;
+    }
+    // display_memory(mem_arr);
     op.close();
     file2.close();
     return 0;
