@@ -114,7 +114,7 @@ string getOpcode(string inp, string s)
 {
     // hello
     //  add the opcode for final output string of instruction
-    if (inp == "add" || inp == "sll" || inp == "slt" || inp == "xor" || inp == "srl" || inp == "or" || inp == "and")
+    if (inp == "rem" || inp == "sra" || inp == "add" || inp == "sll" || inp == "slt" || inp == "xor" || inp == "srl" || inp == "or" || inp == "and" || inp == "sub" || inp == "mul" || inp == "div")
         s += "0110011";
     else if (inp == "addi" || inp == "andi" || inp == "ori")
         s += "0010011";
@@ -154,9 +154,16 @@ string getRegister(string inp, string s)
     }
 
     string neo;
-    for (ll i = 1; i < inp.size(); i++)
+    ll sz;
+    if (inp[inp.size() - 1] == ',')
+        sz = inp.size() - 1;
+    else
+        sz = inp.size();
+
+    for (ll i = 1; i < sz; i++)
         neo += inp[i];
-    // keep check for integer input only
+    // cout << inp << " " << sz << endl;
+    //  keep check for integer input only
     ll flag = 0;
     for (ll i = 0; i < neo.size(); i++)
     {
@@ -613,6 +620,52 @@ void getIformat(string txt)
     pc_count.push_back(pc);
 }
 
+void getNewIformat(string txt)
+{
+    string final;
+    istringstream iss(txt); // create string stream
+    string line;
+    iss >> line;
+    string keep = line;
+    vector<string> ret(6, "");
+    ret[0] = getOpcode(keep, ret[0]);
+    iss >> line;
+    if (line == ",")
+        iss >> line;
+    ret[1] = getRegister(line, ret[1]);
+    ret[2] = getFunc3(line, ret[2]);
+    iss >> line;
+    if (line == ",")
+        iss >> line;
+    string off, reg;
+    ll ind = 0;
+    while (line[ind] != '(')
+    {
+        off += line[ind];
+        ind++;
+    }
+    ind++;
+    while (line[ind] != ')')
+    {
+        reg += line[ind];
+        ind++;
+    }
+
+    ret[3] = getRegister(reg, ret[3]);
+    ret[4] = getImmediate(off, ret[4]);
+    for (ll i = 4; i >= 0; i--)
+    {
+        final += ret[i];
+        if (ret[i] == "error")
+        {
+            store.push_back("error");
+            return;
+        }
+    }
+    store.push_back(final);
+    pc_count.push_back(pc);
+}
+
 void getSformat(string txt)
 {
     string final;
@@ -825,9 +878,13 @@ void assemble(string txt)
     {
         getRformat(txt);
     }
-    else if (line == "addi" || line == "andi" || line == "ori" || line == "lb" || line == "ld" || line == "lh" || line == "lw" || line == "jalr")
+    else if (line == "addi" || line == "andi" || line == "ori")
     {
         getIformat(txt);
+    }
+    else if (line == "lb" || line == "ld" || line == "lh" || line == "lw" || line == "jalr")
+    {
+        getNewIformat(txt);
     }
     else if (line == "sb" || line == "sw" || line == "sd" || line == "sh")
     {
@@ -860,9 +917,16 @@ void read(string txt)
     string keep = line;
     if (keep[keep.size() - 1] != ':')
         iss >> line;
+    ll sz = keep.size();
     if (line == ":" || keep[keep.size() - 1] == ':')
     {
-        label[keep] = pc;
+        // cout << keep << endl;
+        if (keep[keep.size() - 1] == ':')
+            sz--;
+        string tobe;
+        for (ll i = 0; i < sz; i++)
+            tobe += keep[i];
+        label[tobe] = pc;
         return; // only label in that line
     }
     pc += 4;
@@ -941,7 +1005,7 @@ int main()
         else
         {
             op << i << endl;
-            break;
+            // break;
         }
         ct++;
     }
@@ -975,6 +1039,7 @@ int main()
         op << endl;
         Start -= 4;
     }
+
     // display_memory(mem_arr);
     op.close();
     file2.close();
