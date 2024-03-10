@@ -53,9 +53,9 @@ Our project supports below mentioned instructions:
     git clone URL
     ```
 
-2. Compile the `main1.cpp` file using gcc:
+2. Compile the `main.cpp` file using g++:
     ```bash
-    gcc main1.cpp
+    g++ main.cpp
     ```
 
 3. Run the executable:
