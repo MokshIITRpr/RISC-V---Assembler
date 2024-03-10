@@ -33,6 +33,14 @@
 | jal         | UJ     | 1101111|       |         |
 
 
+Basics to ensure proper running of code :
+--> Ensure each assembly directive is written on a separate line and followed by a space.
+--> Comma cannot be used as a delimiter unless used with a space before and afterwards!!
+--> If a line contains a label then it cannot conatina any instruction . Please check the given "input.asm" for the format of labels.
+--> After a ".data" ensure that there is a ".text" before starting the series of instructions.
+--> There should be atleast one space in between the variables(registers and labels) and the immediate values .
+--> There should also be atleast one space in between the operand types and registers following the command.
+
 ### Supported Instructions and Formats
 
 1. **R Format**
@@ -62,8 +70,6 @@
 3. **S Format**
    - **sb rs2, imm (rs1)**: Stores the lowest byte of the value in register rs2 to the memory address calculated by adding the immediate value imm to the value in register rs1.
 
-   
-    **Note**: Ensure there is a space between imm and (rs1).
 
    - **sw rs2, imm (rs1)**: Stores the entire 32-bit value in register rs2 to the memory address calculated by adding the immediate value imm to the value in register rs1.
    - **sd rs2, imm (rs1)**: Stores the entire 64-bit value in register rs2 to the memory address calculated by adding the immediate value imm to the value in register rs1.
@@ -95,7 +101,7 @@ In addition to instructions, the assembler supports the following directives:
 - **.dword**: Reserves space for eight bytes of data.
 - **.asciiz**: Defines a null-terminated ASCII string.
 
-Ensure each assembly directive is written on a separate line and followed by a space.
+
 
 ### Data Segment and Program Counter Information:
 
