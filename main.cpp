@@ -948,6 +948,9 @@ int main()
     initializeMap();
     ofstream op("output.mc");
     ifstream file("input.asm");
+    op << "PC"
+       << "    "
+       << "MACHINE CODE\n";
     string txt;
     ll mem_arr[204];
     for (ll i = 0; i < 204; i++)
