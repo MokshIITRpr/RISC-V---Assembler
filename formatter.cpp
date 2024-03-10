@@ -87,8 +87,7 @@ void initializeMap()
     int mppsize = (sizeof(old_arr) /
                    sizeof(old_arr[0]));
 
-    unordered_map<string, string> mpp1(old_arr,
-                                       old_arr + mppsize);
+    unordered_map<string, string> mpp1(old_arr, old_arr + mppsize);
     registers = mpp1;
 }
 
@@ -474,7 +473,7 @@ void addMemory(string txt, ll mem_arr[200])
             if (line == ",")
                 continue;
             ll get = 0;
-            for (ll i = 0; i < line.size(); i++)
+            for (ll i = 1; i < line.size() - 1; i++)
             {
                 get += (ll)line[i];
                 mem_arr[size1] = get;
