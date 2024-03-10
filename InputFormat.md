@@ -33,65 +33,65 @@
 | jal         | UJ     | 1101111|       |         |
 
 
-Basics to ensure proper running of code :
---> Ensure each assembly directive is written on a separate line and followed by a space.
---> Comma cannot be used as a delimiter unless used with a space before and afterwards!!
---> If a line contains a label then it cannot conatina any instruction . Please check the given "input.asm" for the format of labels.
---> After a ".data" ensure that there is a ".text" before starting the series of instructions.
---> There should be atleast one space in between the variables(registers and labels) and the immediate values .
---> There should also be atleast one space in between the operand types and registers following the command.
+**Basics to ensure proper running of code :**  
+- Ensure each assembly directive is written on a separate line and followed by a space.
+- **`Comma cannot be used as a delimiter unless used with a space before and afterwards!!.`**
+- If a line contains a label then it cannot conatina any instruction . Please check the given "input.asm" for the format of labels.
+- After a ".data" ensure that there is a ".text" before starting the series of instructions.
+- There should be atleast one space in between the variables(registers and labels) and the immediate values .
+- There should also be atleast one space in between the operand types and registers following the command.
 
 ### Supported Instructions and Formats
 
 1. **R Format**
-   - **add rd, rs1, rs2**: Adds the values in registers rs1 and rs2 and stores the result in register rd.
-   - **and rd, rs1, rs2**: Performs a bitwise AND operation between the values in registers rs1 and rs2 and stores the result in register rd.
-   - **or rd, rs1, rs2**: Performs a bitwise OR operation between the values in registers rs1 and rs2 and stores the result in register rd.
-   - **sll rd, rs1, rs2**: Performs a logical left shift of the value in register rs1 by the number of bits specified in register rs2 and stores the result in register rd.
-   - **slt rd, rs1, rs2**: Sets rd to 1 if rs1 is less than rs2, otherwise sets rd to 0.
-   - **sra rd, rs1, rs2**: Performs an arithmetic right shift of the value in register rs1 by the number of bits specified in register rs2 and stores the result in register rd.
-   - **srl rd, rs1, rs2**: Performs a logical right shift of the value in register rs1 by the number of bits specified in register rs2 and stores the result in register rd.
-   - **sub rd, rs1, rs2**: Subtracts the value in register rs2 from the value in register rs1 and stores the result in register rd.
-   - **xor rd, rs1, rs2**: Performs a bitwise XOR operation between the values in registers rs1 and rs2 and stores the result in register rd.
-   - **mul rd, rs1, rs2**: Multiplies the values in registers rs1 and rs2 and stores the lower 32 bits of the result in register rd.
-   - **div rd, rs1, rs2**: Divides the value in register rs1 by the value in register rs2 and stores the quotient in register rd.
-   - **rem rd, rs1, rs2**: Divides the value in register rs1 by the value in register rs2 and stores the remainder in register rd.
+   - **add rd rs1 rs2**: Adds the values in registers rs1 and rs2 and stores the result in register rd.
+   - **and rd rs1 rs2**: Performs a bitwise AND operation between the values in registers rs1 and rs2 and stores the result in register rd.
+   - **or rd rs1 rs2**: Performs a bitwise OR operation between the values in registers rs1 and rs2 and stores the result in register rd.
+   - **sll rd rs1 rs2**: Performs a logical left shift of the value in register rs1 by the number of bits specified in register rs2 and stores the result in register rd.
+   - **slt rd rs1 rs2**: Sets rd to 1 if rs1 is less than rs2 otherwise sets rd to 0.
+   - **sra rd rs1 rs2**: Performs an arithmetic right shift of the value in register rs1 by the number of bits specified in register rs2 and stores the result in register rd.
+   - **srl rd rs1 rs2**: Performs a logical right shift of the value in register rs1 by the number of bits specified in register rs2 and stores the result in register rd.
+   - **sub rd rs1 rs2**: Subtracts the value in register rs2 from the value in register rs1 and stores the result in register rd.
+   - **xor rd rs1 rs2**: Performs a bitwise XOR operation between the values in registers rs1 and rs2 and stores the result in register rd.
+   - **mul rd rs1 rs2**: Multiplies the values in registers rs1 and rs2 and stores the lower 32 bits of the result in register rd.
+   - **div rd rs1 rs2**: Divides the value in register rs1 by the value in register rs2 and stores the quotient in register rd.
+   - **rem rd rs1 rs2**: Divides the value in register rs1 by the value in register rs2 and stores the remainder in register rd.
 
 2. **I Format**
-   - **addi rd, rs1, imm**: Adds the immediate value imm to the value in register rs1 and stores the result in register rd.
-   - **andi rd, rs1, imm**: Performs a bitwise AND operation between the value in register rs1 and the immediate value imm and stores the result in register rd.
-   - **ori rd, rs1, imm**: Performs a bitwise OR operation between the value in register rs1 and the immediate value imm and stores the result in register rd.
-   - **lb rd, rs1, imm**: Loads a byte from the memory address calculated by adding the immediate value imm to the value in register rs1 and sign-extends it to 32 bits before storing it in register rd.
-   - **ld rd, rs1, imm**: Loads a double word (64 bits) from the memory address calculated by adding the immediate value imm to the value in register rs1 and stores it in register rd.
-   - **lh rd, rs1, imm**: Loads a half word (16 bits) from the memory address calculated by adding the immediate value imm to the value in register rs1 and sign-extends it to 32 bits before storing it in register rd.
-   - **lw rd, rs1, imm**: Loads a word (32 bits) from the memory address calculated by adding the immediate value imm to the value in register rs1 and stores it in register rd.
-   - **jalr rd, rs1, imm**: Sets rd to the address of the instruction following the jalr instruction, then jumps to the address calculated by adding the immediate value imm to the value in register rs1.
+   - **addi rd rs1 imm**: Adds the immediate value imm to the value in register rs1 and stores the result in register rd.
+   - **andi rd rs1 imm**: Performs a bitwise AND operation between the value in register rs1 and the immediate value imm and stores the result in register rd.
+   - **ori rd rs1 imm**: Performs a bitwise OR operation between the value in register rs1 and the immediate value imm and stores the result in register rd.
+   - **lb rd rs1 imm**: Loads a byte from the memory address calculated by adding the immediate value imm to the value in register rs1 and sign-extends it to 32 bits before storing it in register rd.
+   - **ld rd rs1 imm**: Loads a double word (64 bits) from the memory address calculated by adding the immediate value imm to the value in register rs1 and stores it in register rd.
+   - **lh rd rs1 imm**: Loads a half word (16 bits) from the memory address calculated by adding the immediate value imm to the value in register rs1 and sign-extends it to 32 bits before storing it in register rd.
+   - **lw rd rs1 imm**: Loads a word (32 bits) from the memory address calculated by adding the immediate value imm to the value in register rs1 and stores it in register rd.
+   - **jalr rd rs1 imm**: Sets rd to the address of the instruction following the jalr instruction then jumps to the address calculated by adding the immediate value imm to the value in register rs1.
 
 3. **S Format**
-   - **sb rs2, imm (rs1)**: Stores the lowest byte of the value in register rs2 to the memory address calculated by adding the immediate value imm to the value in register rs1.
+   - **sb rs2 imm (rs1)**: Stores the lowest byte of the value in register rs2 to the memory address calculated by adding the immediate value imm to the value in register rs1.
 
 
-   - **sw rs2, imm (rs1)**: Stores the entire 32-bit value in register rs2 to the memory address calculated by adding the immediate value imm to the value in register rs1.
-   - **sd rs2, imm (rs1)**: Stores the entire 64-bit value in register rs2 to the memory address calculated by adding the immediate value imm to the value in register rs1.
-   - **sh rs2, imm (rs1)**: Stores the lowest half word (16 bits) of the value in register rs2 to the memory address calculated by adding the immediate value imm to the value in register rs1.
+   - **sw rs2 imm (rs1)**: Stores the entire 32-bit value in register rs2 to the memory address calculated by adding the immediate value imm to the value in register rs1.
+   - **sd rs2 imm (rs1)**: Stores the entire 64-bit value in register rs2 to the memory address calculated by adding the immediate value imm to the value in register rs1.
+   - **sh rs2 imm (rs1)**: Stores the lowest half word (16 bits) of the value in register rs2 to the memory address calculated by adding the immediate value imm to the value in register rs1.
  
 
 5. **SB Format**
-   - **beq rs1, rs2, label**: Branches to the instruction at the specified label if the values in registers rs1 and rs2 are equal.
-   - **bne rs1, rs2, label**: Branches to the instruction at the specified label if the values in registers rs1 and rs2 are not equal.
-   - **bge rs1, rs2, label**: Branches to the instruction at the specified label if the value in register rs1 is greater than or equal to the value in register rs2.
-   - **blt rs1, rs2, label**: Branches to the instruction at the specified label if the value in register rs1 is less than the value in register rs2.
+   - **beq rs1 rs2 label**: Branches to the instruction at the specified label if the values in registers rs1 and rs2 are equal.
+   - **bne rs1 rs2 label**: Branches to the instruction at the specified label if the values in registers rs1 and rs2 are not equal.
+   - **bge rs1 rs2 label**: Branches to the instruction at the specified label if the value in register rs1 is greater than or equal to the value in register rs2.
+   - **blt rs1 rs2 label**: Branches to the instruction at the specified label if the value in register rs1 is less than the value in register rs2.
 
 6. **U Format**
-   - **auipc rd, imm**: Adds the immediate value imm to the address of the current instruction (PC), sign-extends the result to 64 bits, and stores it in register rd.
-   - **lui rd, imm**: Loads the immediate value imm into the upper 20 bits of register rd and zeroes out the lower 12 bits.
+   - **auipc rd imm**: Adds the immediate value imm to the address of the current instruction (PC) sign-extends the result to 64 bits and stores it in register rd.
+   - **lui rd imm**: Loads the immediate value imm into the upper 20 bits of register rd and zeroes out the lower 12 bits.
 
 7. **UJ Format**
-   - **jal rd, label**: Jumps to the instruction at the specified label and stores the address of the instruction following the jal instruction in register rd.
+   - **jal rd label**: Jumps to the instruction at the specified label and stores the address of the instruction following the jal instruction in register rd.
 
 ### Assembler Directives
 
-In addition to instructions, the assembler supports the following directives:
+In addition to instructions the assembler supports the following directives:
 
 - **.text**: Indicates the start of the text segment where instructions are located.
 - **.data**: Indicates the start of the data segment where initialized data is located.
