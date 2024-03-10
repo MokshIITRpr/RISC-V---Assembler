@@ -1,3 +1,9 @@
+.data
+n: .asciiz "abcdef"
+b : .word 100 200
+c: .half 110 200
+d: .dword 0x100 0xAB
+.text
 add x1 x1 x2
 and x2 x2 x22
 or x3 x3 x23
@@ -32,5 +38,5 @@ blt x22 x23 label4
 label4:
 auipc x24 0x800
 lui x25 0x1234
-jal x26 label5
+jal x26 label5
 label5:
