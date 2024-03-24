@@ -3,6 +3,7 @@
 using namespace std;
 #define ll long long
 #define err 1e18
+ofstream op("bp_output.mc");
 
 map<ll, string> bpnt_actual;
 map<ll, string> bpnt_predicted;
@@ -14,6 +15,7 @@ map<ll, string> bptb_actual;
 map<ll, string> bptb_predicted;
 
 map<ll, char> prev_state;
+map<ll, string> dyn_state;
 ll previous = 0;
 ll current = 0;
 string last = "";
@@ -92,24 +94,55 @@ void branch_predictor_one_bit()
 
 void branch_predictor_two_bit()
 {
+    if (dyn_state.find(previous) == dyn_state.end())
+        dyn_state[previous] = "NN";
+
+    // we initialise as strongly not taken
+
+    if (last.size() == 0)
+        return;
+    else if (last[0] == 'b')
+    {
+        bptb_predicted[previous] += dyn_state[previous][0]; // always not taken in predicted;
+        if (current - previous == 4)
+        {
+            bptb_actual[previous] += 'T';
+            if (dyn_state[previous][1] == 'N')
+                dyn_state[previous] = "NT";
+            else
+                dyn_state[previous] = "TT";
+        }
+        else
+        {
+            bptb_actual[previous] += 'N';
+            if (dyn_state[previous][1] == 'N')
+                dyn_state[previous] = "NN";
+            else
+                dyn_state[previous] = "TN";
+        }
+        return;
+    }
+    else
+        return;
 }
 
 void display(map<ll, string> &mp1, map<ll, string> &mp2)
 {
     for (auto i : mp1)
     {
-        cout << "For Instruction with PC : 0x" << hex << i.first << endl;
-        cout << "Predicted : ";
-        cout << i.second[0] << " ";
+        op << "For Instruction with PC : 0x" << hex << i.first << endl
+           << endl;
+        op << "Predicted : ";
+        op << i.second[0] << " ";
         for (ll j = 1; j < (i.second).size(); j++)
-            cout << "| " << i.second[j] << " ";
-        cout << endl;
-        cout << "   Actual : ";
+            op << "| " << i.second[j] << " ";
+        op << endl;
+        op << "   Actual : ";
         string temp = mp2[i.first];
-        cout << temp[0] << " ";
+        op << temp[0] << " ";
         for (ll j = 1; j < temp.size(); j++)
-            cout << "| " << temp[j] << " ";
-        cout << endl;
+            op << "| " << temp[j] << " ";
+        op << endl;
         ll count = 0;
         for (ll j = 0; j < temp.size(); j++)
         {
@@ -117,20 +150,26 @@ void display(map<ll, string> &mp1, map<ll, string> &mp2)
                 count++;
         }
         ll total = temp.size();
-        cout << "The number of correctly predicted jumps are : " << count << endl;
-        cout << "The total number of jumps are : " << total << endl;
+        op << "The number of correctly predicted jumps are : " << count << endl;
+        op << "The total number of jumps are : " << total << endl;
         double per = ((double)count) / ((double)total);
-        cout << "The correctly predicted percentage is : ";
-        cout << setprecision(20) << (double)(per * 100.0) << endl;
-        cout << "------------------------------------------------------------------------------------------" << endl;
+        op << "The correctly predicted percentage is : ";
+        op << setprecision(20) << (double)(per * 100.0) << endl
+           << endl;
+        op << "------------------------------------------------------------------------------------------" << endl
+           << endl;
     }
+    op << endl;
+    op << endl;
+    op << endl;
 }
 
 int main()
 {
     // we start for not taken
 
-    ifstream file("input.asm");
+    ifstream file("bp_input.asm");
+
     string txt;
     previous = 0;
     current = 0;
@@ -149,11 +188,23 @@ int main()
         branch_predictor_not_taken();
         branch_predictor_taken();
         branch_predictor_one_bit();
-
+        branch_predictor_two_bit();
         previous = current; // going to next instruction so we need to keep pc in case we had a jump
         last = line;        // store this instruction so we know whether to check for jump or not
     }
-    file.close();
+    op << "Not Taken Branch Predictor" << endl
+       << endl;
     display(bpnt_predicted, bpnt_actual);
+    op << "Taken Branch Predictor" << endl
+       << endl;
+    display(bpt_predicted, bpt_actual);
+    op << "One Bit Dynamic Branch Predictor" << endl
+       << endl;
+    display(bpob_predicted, bpob_actual);
+    op << "Two Bit Dyanmic Branch Predictor" << endl
+       << endl;
+    display(bptb_predicted, bptb_actual);
+    file.close();
+    op.close();
     return 0;
 }
