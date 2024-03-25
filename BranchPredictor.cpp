@@ -13,9 +13,12 @@ map<ll, string> bpob_actual;
 map<ll, string> bpob_predicted;
 map<ll, string> bptb_actual;
 map<ll, string> bptb_predicted;
+map<ll, vector<ll>> btb;
+vector<double> final;
 
 map<ll, char> prev_state;
 map<ll, string> dyn_state;
+ll keep = 0;
 ll previous = 0;
 ll current = 0;
 string last = "";
@@ -156,15 +159,66 @@ void display(map<ll, string> &mp1, map<ll, string> &mp2)
            << endl;
     }
 
-    op << "The number of correctly predicted jumps are : " << count << endl;
-    op << "The total number of jumps are : " << total << endl;
+    op << "The number of hits are : " << setprecision(20) << (count) << endl;
+    op << "The number of miss are : " << setprecision(20) << (total - count) << endl;
+    op << "The total number of jumps are : " << setprecision(20) << (total) << endl;
     double per = ((double)count) / ((double)total);
-    op << "The correctly predicted percentage is : ";
+    op << "The accuracy is : ";
     op << setprecision(20) << (double)(per * 100.0) << endl
        << endl;
     op << endl;
     op << endl;
     op << endl;
+    final.push_back(per * 100.0);
+}
+
+void branch_target_buffer(string txt)
+{
+    istringstream iss(txt); // create string stream
+    string line;
+    iss >> line; // getting the core
+    iss >> line; // 0:
+    iss >> line; // hex;
+    string store = line;
+    iss >> line;
+    iss >> line; //
+    if (line[0] != 'b')
+        return;
+    op << endl;
+    op << setprecision(20) << (keep) << "     "
+       << "Instruction : " << store << endl;
+    op << "       "
+       << "PC : "
+       << "0x" << hex << current << endl;
+    while (line[0] != 'p')
+        iss >> line;
+    iss >> line;
+    string temp = line; // store the sign
+    iss >> line;
+    ll get = 0;
+    op << "       "
+       << "Target : ";
+    if (line[0] != '0')
+    {
+        for (ll i = 0; i < line.size(); i++)
+            get = (get * 10) + (ll)(line[i] - '0');
+    }
+    else
+    {
+        for (ll i = 2; i < line.size(); i++)
+        {
+            if (line[i] <= '9' && line[i] >= '0')
+                get = (get * 16) + (ll)(line[i] - '0');
+            else
+                get = (get * 16) + (ll)(line[i] - 'A') + 10ll;
+        }
+    }
+    if (temp == "-")
+        op << "0x" << hex << current - get << endl;
+    else
+        op << "0x" << hex << current + get << endl;
+    keep++;
+    op << "================================================================" << endl;
 }
 
 int main()
@@ -178,6 +232,9 @@ int main()
     current = 0;
     char prev_state = 'N'; // for one bit initialise as not taken
     last = "";             // initialise as zero size for the first instruction captured
+    op << "Branch target buffer : " << endl
+       << endl
+       << endl;
     while (getline(file, txt))
     {
         istringstream iss(txt); // create string stream
@@ -192,9 +249,13 @@ int main()
         branch_predictor_taken();
         branch_predictor_one_bit();
         branch_predictor_two_bit();
+        branch_target_buffer(txt);
         previous = current; // going to next instruction so we need to keep pc in case we had a jump
         last = line;        // store this instruction so we know whether to check for jump or not
     }
+    op << endl
+       << endl
+       << endl;
     op << "Not Taken Branch Predictor" << endl
        << endl;
     display(bpnt_predicted, bpnt_actual);
@@ -207,6 +268,11 @@ int main()
     op << "Two Bit Dyanmic Branch Predictor" << endl
        << endl;
     display(bptb_predicted, bptb_actual);
+    op << "The final outcome : " << endl;
+    op << "Not Taken Branch Predictor Accuracy : " << final[0] << endl;
+    op << "Taken Branch Predictor Accuracy : " << final[1] << endl;
+    op << "One Bit Branch Predictor Accuracy : " << final[2] << endl;
+    op << "Two Bit Branch Predictor Accuracy : " << final[3] << endl;
     file.close();
     op.close();
     return 0;
