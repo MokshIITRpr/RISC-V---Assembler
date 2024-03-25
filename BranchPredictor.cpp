@@ -39,9 +39,9 @@ void branch_predictor_not_taken()
     else if (last[0] == 'b')
     {
         if (current - previous == 4)
-            bpnt_actual[previous] += 'T';
-        else
             bpnt_actual[previous] += 'N';
+        else
+            bpnt_actual[previous] += 'T';
         bpnt_predicted[previous] += 'N'; // always not taken in predicted;
         return;
     }
@@ -57,9 +57,9 @@ void branch_predictor_taken()
     else if (last[0] == 'b')
     {
         if (current - previous == 4)
-            bpt_actual[previous] += 'T';
-        else
             bpt_actual[previous] += 'N';
+        else
+            bpt_actual[previous] += 'T';
         bpt_predicted[previous] += 'T'; // always not taken in predicted;
         return;
     }
@@ -78,13 +78,13 @@ void branch_predictor_one_bit()
         bpob_predicted[previous] += prev_state[previous]; // always not taken in predicted;
         if (current - previous == 4)
         {
-            bpob_actual[previous] += 'T';
-            prev_state[previous] = 'T'; // new predicted for next set
+            bpob_actual[previous] += 'N';
+            prev_state[previous] = 'N'; // new predicted for next set
         }
         else
         {
-            bpob_actual[previous] += 'N';
-            prev_state[previous] = 'N'; // new predicted for next set
+            bpob_actual[previous] += 'T';
+            prev_state[previous] = 'T'; // new predicted for next set
         }
         return;
     }
@@ -106,19 +106,19 @@ void branch_predictor_two_bit()
         bptb_predicted[previous] += dyn_state[previous][0]; // always not taken in predicted;
         if (current - previous == 4)
         {
-            bptb_actual[previous] += 'T';
-            if (dyn_state[previous][1] == 'N')
-                dyn_state[previous] = "NT";
-            else
-                dyn_state[previous] = "TT";
-        }
-        else
-        {
             bptb_actual[previous] += 'N';
             if (dyn_state[previous][1] == 'N')
                 dyn_state[previous] = "NN";
             else
                 dyn_state[previous] = "TN";
+        }
+        else
+        {
+            bptb_actual[previous] += 'T';
+            if (dyn_state[previous][1] == 'N')
+                dyn_state[previous] = "NT";
+            else
+                dyn_state[previous] = "TT";
         }
         return;
     }
@@ -128,6 +128,8 @@ void branch_predictor_two_bit()
 
 void display(map<ll, string> &mp1, map<ll, string> &mp2)
 {
+    ll count = 0;
+    ll total = 0;
     for (auto i : mp1)
     {
         op << "For Instruction with PC : 0x" << hex << i.first << endl
@@ -143,22 +145,23 @@ void display(map<ll, string> &mp1, map<ll, string> &mp2)
         for (ll j = 1; j < temp.size(); j++)
             op << "| " << temp[j] << " ";
         op << endl;
-        ll count = 0;
         for (ll j = 0; j < temp.size(); j++)
         {
             if ((i.second)[j] == temp[j])
                 count++;
         }
-        ll total = temp.size();
-        op << "The number of correctly predicted jumps are : " << count << endl;
-        op << "The total number of jumps are : " << total << endl;
-        double per = ((double)count) / ((double)total);
-        op << "The correctly predicted percentage is : ";
-        op << setprecision(20) << (double)(per * 100.0) << endl
-           << endl;
+
+        total += temp.size();
         op << "------------------------------------------------------------------------------------------" << endl
            << endl;
     }
+
+    op << "The number of correctly predicted jumps are : " << count << endl;
+    op << "The total number of jumps are : " << total << endl;
+    double per = ((double)count) / ((double)total);
+    op << "The correctly predicted percentage is : ";
+    op << setprecision(20) << (double)(per * 100.0) << endl
+       << endl;
     op << endl;
     op << endl;
     op << endl;
