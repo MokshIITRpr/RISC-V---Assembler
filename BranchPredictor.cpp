@@ -161,7 +161,7 @@ void display(map<ll, string> &mp1, map<ll, string> &mp2)
             if ((i.second)[j] == temp[j])
                 count++;
         }
-        op << "Hit / Miss : ";
+        op << "Hit/Miss  : ";
         (i.second)[0] == temp[0] ? op << 'H' : op << 'M';
         op << " ";
         for (ll j = 1; j < temp.size(); j++)
