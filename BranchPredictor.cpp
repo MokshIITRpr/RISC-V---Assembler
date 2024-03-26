@@ -18,7 +18,7 @@ vector<double> final;
 
 map<ll, char> prev_state;
 map<ll, string> dyn_state;
-ll keep = 0;
+double keep = 0;
 ll previous = 0;
 ll current = 0;
 string last = "";
@@ -110,17 +110,25 @@ void branch_predictor_two_bit()
         if (current - previous == 4)
         {
             bptb_actual[previous] += 'N';
-            if (dyn_state[previous][1] == 'N')
+            if (dyn_state[previous] == "NN")
                 dyn_state[previous] = "NN";
-            else
+            else if (dyn_state[previous] == "NT")
+                dyn_state[previous] = "NN";
+            else if (dyn_state[previous] == "TN")
+                dyn_state[previous] = "NT";
+            else if (dyn_state[previous] == "TT")
                 dyn_state[previous] = "TN";
         }
         else
         {
             bptb_actual[previous] += 'T';
-            if (dyn_state[previous][1] == 'N')
+            if (dyn_state[previous] == "NN")
                 dyn_state[previous] = "NT";
-            else
+            else if (dyn_state[previous] == "NT")
+                dyn_state[previous] = "TN";
+            else if (dyn_state[previous] == "TN")
+                dyn_state[previous] = "TT";
+            else if (dyn_state[previous] == "TT")
                 dyn_state[previous] = "TT";
         }
         return;
@@ -131,8 +139,8 @@ void branch_predictor_two_bit()
 
 void display(map<ll, string> &mp1, map<ll, string> &mp2)
 {
-    ll count = 0;
-    ll total = 0;
+    double count = 0;
+    double total = 0;
     for (auto i : mp1)
     {
         op << "For Instruction with PC : 0x" << hex << i.first << endl
@@ -190,15 +198,30 @@ void branch_target_buffer(string txt)
     op << "       "
        << "PC : "
        << "0x" << hex << current << endl;
-    while (line[0] != 'p')
+    while (line[0] != 'p' && !(line[0] <= '9' && line[0] >= '0') && line[0] != '-')
         iss >> line;
-    iss >> line;
-    string temp = line; // store the sign
-    iss >> line;
+    string temp;
+    if (line[0] == 'p')
+    {
+        iss >> line;
+        temp = line; // store the sign
+        iss >> line;
+    }
+    else if (line[0] == '-')
+    {
+        temp = '-';
+        string t;
+        for (ll i = 1; i < line.size(); i++)
+            t += line[i];
+        line = t;
+    }
+    // else we already have the integer
     ll get = 0;
     op << "       "
        << "Target : ";
-    if (line[0] != '0')
+    if (line.size() == 1 && line[0] == '0')
+        get = 0;
+    else if (line[0] != '0')
     {
         for (ll i = 0; i < line.size(); i++)
             get = (get * 10) + (ll)(line[i] - '0');
@@ -217,7 +240,7 @@ void branch_target_buffer(string txt)
         op << "0x" << hex << current - get << endl;
     else
         op << "0x" << hex << current + get << endl;
-    keep++;
+    keep += 1;
     op << "================================================================" << endl;
 }
 
